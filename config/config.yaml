@@ -40,8 +40,8 @@ app:
 # 详细时间线图请查看 config/timeline.yaml
 # ===============================================================
 schedule:
-  enabled: false                        # 是否启用调度系统（true=启用, false=关闭，默认关闭）
-  preset: "morning_evening"             # 预设模板名称（见上方说明）
+  enabled: true                         # 是否启用调度系统（true=启用, false=关闭，默认关闭）
+  preset: "custom"                      # 自定义：早晚各推送一次当日汇总（见 timeline.yaml）
 
 
 # ===============================================================
@@ -66,39 +66,62 @@ platforms:
   api_url: ""                            # 热榜数据 API 地址（留空使用默认地址）
                                         # 如果你自行部署了 newsnow，填入你的地址，如: https://your-domain.com/api/s
   sources:
-    - id: "toutiao"
-      name: "今日头条"
-      expected_domain: "toutiao.com"
-    - id: "baidu"
-      name: "百度热搜"
-      expected_domain: "baidu.com"
+    # ── 财经（国内）──
     - id: "wallstreetcn-hot"
       name: "华尔街见闻"
       expected_domain: "wallstreetcn.com"
-    - id: "thepaper"
-      name: "澎湃新闻"
-      expected_domain: "thepaper.cn"
-    - id: "bilibili-hot-search"
-      name: "bilibili 热搜"
-      expected_domain: "bilibili.com"
     - id: "cls-hot"
       name: "财联社热门"
       expected_domain: "cls.cn"
-    - id: "ifeng"
-      name: "凤凰网"
-      expected_domain: "ifeng.com"
-    - id: "tieba"
-      name: "贴吧"
-      expected_domain: "baidu.com"
+    - id: "jin10"
+      name: "金十数据"
+      expected_domain: "jin10.com"
+    - id: "xueqiu-hotstock"
+      name: "雪球热股"
+      expected_domain: "xueqiu.com"
+    - id: "mktnews-flash"
+      name: "MKTNews快讯"
+      expected_domain: "mktnews.net"
+    - id: "gelonghui"
+      name: "格隆汇"
+      expected_domain: "gelonghui.com"
+
+    # ── 科技 ──
+    - id: "36kr"
+      name: "36氪"
+      expected_domain: "36kr.com"
+    - id: "ithome"
+      name: "IT之家"
+      expected_domain: "ithome.com"
+    - id: "solidot"
+      name: "Solidot"
+      expected_domain: "solidot.org"
+
+    # ── 国际（中文源）──
+    - id: "zaobao"
+      name: "联合早报"
+      # 不配 expected_domain：newsnow 上游实际抓取 zaochenbao.com 镜像站，
+      # 配错域名会导致该源数据被安全校验整单丢弃，先放行观察日志
+    - id: "cankaoxiaoxi"
+      name: "参考消息"
+      expected_domain: "cankaoxiaoxi.com"
+    - id: "sputniknewscn"
+      name: "卫星通讯社"
+      expected_domain: "sputniknews.cn"
+
+    # ── 国内综合（补充热点覆盖）──
+    - id: "toutiao"
+      name: "今日头条"
+      expected_domain: "toutiao.com"
     - id: "weibo"
       name: "微博"
       expected_domain: "weibo.com"
-    - id: "douyin"
-      name: "抖音"
-      expected_domain: "douyin.com"
-    - id: "zhihu"
-      name: "知乎"
-      expected_domain: "zhihu.com"
+    - id: "thepaper"
+      name: "澎湃新闻"
+      expected_domain: "thepaper.cn"
+    - id: "ifeng"
+      name: "凤凰网"
+      expected_domain: "ifeng.com"
 
 
 
@@ -131,11 +154,11 @@ rss:
       name: "Hacker News"
       url: "https://hnrss.org/frontpage"
 
-    - id: "ruanyifeng"
-      name: "阮一峰的网络日志"
-      url: "http://www.ruanyifeng.com/blog/atom.xml"
-      enabled: false                  # 禁用
-      # max_age_days: 3               # 示例：推送 3 天内的文章（更新较慢的博客）
+    # - id: "ruanyifeng"
+    #   name: "阮一峰的网络日志"
+    #   url: "http://www.ruanyifeng.com/blog/atom.xml"
+    #   enabled: false                  # 已禁用：更新频率低，需要时取消注释
+    #   # max_age_days: 3               # 示例：推送 3 天内的文章（更新较慢的博客）
      
     - id: "yahoo-finance"
       name: "雅虎财经"
@@ -234,20 +257,20 @@ display:
 
   # 推送区域开关（需配合上方 region_order 使用）
   regions:
-    hotlist: true                     # 热榜区域：关键词匹配 / AI 智能筛选（true=显示, false=隐藏）
+    hotlist: true                     # 热榜区域：关键词匹配（true=显示, false=隐藏）
     new_items: false                  # 新增热点区域：含热榜新增 + RSS 新增（true=显示, false=隐藏）
                                       # 注：热点词汇统计中的新增标记🆕不受此配置影响
 
     rss: true                         # RSS 订阅区域（true=显示并分析, false=隐藏并跳过分析）
-    standalone: false                 # 独立展示区：完整热榜/RSS，不受关键词过滤（true=显示, false=隐藏）
-    ai_analysis: true                 # AI 分析区域（true=显示, false=隐藏）
+    standalone: true                  # 独立展示区：完整热榜/RSS，不受关键词过滤（true=显示, false=隐藏）
+    ai_analysis: false                # AI 分析区域（未配置 AI API Key，保持关闭）
 
   # 独立展示区：将指定平台/RSS 完整展示，不受关键词过滤
   # 推送展示由 regions.standalone 控制，AI 分析由 ai_analysis.include_standalone 控制
   standalone:
-    platforms: ["zhihu", "wallstreetcn-hot"]     # 热榜平台 ID 列表（如 ["zhihu", "weibo"]）
+    platforms: ["wallstreetcn-hot", "cls-hot", "36kr", "zaobao"]   # 每天完整展示这 4 个核心榜单
     rss_feeds: []                                # RSS 源 ID 列表（如 ["hacker-news"]）
-    max_items: 20                                # 每个源最多展示条数（0=不限制）
+    max_items: 15                                # 每个源最多展示条数（0=不限制）
 
 
 # ===============================================================
@@ -412,7 +435,7 @@ ai:
 # 9. AI 分析功能（模型配置见上方 ai 段）
 # ===============================================================
 ai_analysis:
-  enabled: true                     # 是否启用 AI 分析（true=启用, false=关闭）—— 总开关
+  enabled: false                    # 是否启用 AI 分析（未配置 AI_API_KEY，关闭避免运行报错）—— 总开关
                                     # 开启 schedule 后此项仍为总开关：false=永远不分析，true=由调度控制
 
   language: "Chinese"               # 分析报告语言（如 "English", "Korean", "法语"）
@@ -441,7 +464,7 @@ ai_analysis:
 # 对推送标题进行翻译，不包含 AI 分析的内容
 # ===============================================================
 ai_translation:
-  enabled: true                     # 是否启用翻译功能（true=启用, false=关闭）
+  enabled: false                    # 是否启用翻译功能（未配置 AI_API_KEY，关闭避免运行报错）
   language: "中文"                   # 翻译目标语言（如 "English", "Korean", "法语"）
   prompt_file: "ai_translation_prompt.txt"   # 提示词文件（相对于 config 目录）
 
